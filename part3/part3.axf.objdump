@@ -1,0 +1,113 @@
+
+C:/Users/Bob/Desktop/ECE243_Computer_Organization/Labs/Lab_4/part3/part3.axf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <__cs3_interrupt_vector>:
+/* Program that counts consecutive 1's */
+
+			.text                   // executable code follows
+			.global _start                  
+_start:                             
+			MOV     R4, #TEST_NUM   // load the data word ...
+   0:	e3a04088 	mov	r4, #136	; 0x88
+			MOV		R5, #0			//sets r3 to 0
+   4:	e3a05000 	mov	r5, #0
+			SUBS    R4, #4
+   8:	e2544004 	subs	r4, r4, #4
+
+0000000c <NEXT>:
+			
+NEXT:		ADD     R4, #4			//moves pointer to next word
+   c:	e2844004 	add	r4, r4, #4
+			LDR     R1, [R4]        // into R1
+  10:	e5941000 	ldr	r1, [r4]
+			CMP     R1, #0			//check if word is 0
+  14:	e3510000 	cmp	r1, #0
+			BEQ     END
+  18:	0a000019 	beq	84 <END>
+			BL		ONES			//runs ones
+  1c:	eb000009 	bl	48 <ONES>
+			CMP		R5, R0			//checks if last word had greatest number of ones
+  20:	e1550000 	cmp	r5, r0
+			BGE		NZEROS			//if not goes to next
+  24:	aa000001 	bge	30 <NZEROS>
+			MOV		R5, R0			//if yes stores it in r3
+  28:	e1a05000 	mov	r5, r0
+			B		NZEROS	  		//goes to next word
+  2c:	eaffffff 	b	30 <NZEROS>
+
+00000030 <NZEROS>:
+NZEROS:		LDR		R1, [R4]
+  30:	e5941000 	ldr	r1, [r4]
+			BL		ZEROS
+  34:	eb00000a 	bl	64 <ZEROS>
+			CMP		R6, R0			//checks if last word had greatest number of ones
+  38:	e1560000 	cmp	r6, r0
+			BGE		NEXT			//if not goes to next
+  3c:	aafffff2 	bge	c <NEXT>
+			MOV		R6, R0			//if yes stores it in r3
+  40:	e1a06000 	mov	r6, r0
+			B		NEXT	  		//goes to next word			
+  44:	eafffff0 	b	c <NEXT>
+
+00000048 <ONES>:
+
+ONES:	   	MOV     R0, #0          // R0 will hold the result
+  48:	e3a00000 	mov	r0, #0
+
+0000004c <LOOPO>:
+LOOPO:		CMP     R1, #0          // loop until the data contains no more 1's
+  4c:	e3510000 	cmp	r1, #0
+			MOVEQ   PC, LR            
+  50:	01a0f00e 	moveq	pc, lr
+			LSR     R2, R1, #1      // perform SHIFT, followed by AND
+  54:	e1a020a1 	lsr	r2, r1, #1
+			AND     R1, R1, R2      
+  58:	e0011002 	and	r1, r1, r2
+			ADD     R0, #1          // count the string length so far
+  5c:	e2800001 	add	r0, r0, #1
+			B       LOOPO  
+  60:	eafffff9 	b	4c <LOOPO>
+
+00000064 <ZEROS>:
+
+ZEROS:		MOV     R0, #0          // R0 will hold the result
+  64:	e3a00000 	mov	r0, #0
+			NEG		R1, R1
+  68:	e2611000 	rsb	r1, r1, #0
+
+0000006c <LOOPZ>:
+LOOPZ:		CMP     R1, #0          // loop until the data contains no more 1's
+  6c:	e3510000 	cmp	r1, #0
+			MOVEQ   PC, LR            
+  70:	01a0f00e 	moveq	pc, lr
+			LSR     R2, R1, #1      // perform SHIFT, followed by AND
+  74:	e1a020a1 	lsr	r2, r1, #1
+			AND     R1, R1, R2      
+  78:	e0011002 	and	r1, r1, r2
+			ADD     R0, #1          // count the string length so far
+  7c:	e2800001 	add	r0, r0, #1
+			B       LOOPZ	
+  80:	eafffff9 	b	6c <LOOPZ>
+
+00000084 <END>:
+
+END:      	B       END             
+  84:	eafffffe 	b	84 <END>
+
+00000088 <TEST_NUM>:
+  88:	103fe00f 	.word	0x103fe00f
+  8c:	103fe06f 	.word	0x103fe06f
+  90:	103fe02f 	.word	0x103fe02f
+  94:	103fe06d 	.word	0x103fe06d
+  98:	103fb3ce 	.word	0x103fb3ce
+  9c:	103f7a2f 	.word	0x103f7a2f
+  a0:	102b5c34 	.word	0x102b5c34
+  a4:	0000ffff 	.word	0x0000ffff
+  a8:	10444444 	.word	0x10444444
+  ac:	10512341 	.word	0x10512341
+  b0:	103f3542 	.word	0x103f3542
+  b4:	1023554f 	.word	0x1023554f
+  b8:	00000000 	.word	0x00000000

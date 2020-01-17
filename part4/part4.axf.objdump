@@ -1,0 +1,284 @@
+
+C:/Users/Bob/Desktop/ECE243_Computer_Organization/Labs/Lab_4/part4/part4.axf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <__cs3_interrupt_vector>:
+			.text                   // executable code follows
+			.global _start                  
+_start:                             
+			MOV     R4, #TEST_NUM   // load the data word ...
+   0:	e3a040cc 	mov	r4, #204	; 0xcc
+			MOV		R10, #MaskOne
+   4:	e3a0af41 	mov	r10, #260	; 0x104
+			MOV		R11, #MaskTwo
+   8:	e3a0bf42 	mov	r11, #264	; 0x108
+			LDR		R10, [R10]
+   c:	e59aa000 	ldr	r10, [r10]
+			LDR 	R11, [R11]
+  10:	e59bb000 	ldr	r11, [r11]
+			MOV		R5, #0			//sets r3 to 0
+  14:	e3a05000 	mov	r5, #0
+			SUBS    R4, #4
+  18:	e2544004 	subs	r4, r4, #4
+			MOV 	R6, #0
+  1c:	e3a06000 	mov	r6, #0
+			MOV		R7, #0
+  20:	e3a07000 	mov	r7, #0
+
+00000024 <NEXT>:
+			
+NEXT:		ADD     R4, #4			//moves pointer to next word
+  24:	e2844004 	add	r4, r4, #4
+			LDR     R1, [R4]        // into R1
+  28:	e5941000 	ldr	r1, [r4]
+			CMP     R1, #0			//check if word is 0
+  2c:	e3510000 	cmp	r1, #0
+			BEQ     DISPLAY
+  30:	0a00003c 	beq	128 <DISPLAY>
+			BL		ONES			//runs ones
+  34:	eb000014 	bl	8c <ONES>
+			CMP		R5, R0			//checks if last word had greatest number of ones
+  38:	e1550000 	cmp	r5, r0
+			BGE		NZEROS			//if not goes to next
+  3c:	aa000000 	bge	44 <NZEROS>
+			MOV		R5, R0			//if yes stores it in r3
+  40:	e1a05000 	mov	r5, r0
+
+00000044 <NZEROS>:
+NZEROS:		LDR		R1, [R4]
+  44:	e5941000 	ldr	r1, [r4]
+			BL		ZEROS
+  48:	eb000016 	bl	a8 <ZEROS>
+			CMP		R6, R0			//checks if last word had greatest number of ones
+  4c:	e1560000 	cmp	r6, r0
+			BGE		Alternative			//if not goes to next
+  50:	aa000001 	bge	5c <Alternative>
+			MOV		R6, R0			//if yes stores it in r3
+  54:	e1a06000 	mov	r6, r0
+			B		Alternative	  		//goes to next word		
+  58:	eaffffff 	b	5c <Alternative>
+
+0000005c <Alternative>:
+Alternative:LDR     R1, [R4]
+  5c:	e5941000 	ldr	r1, [r4]
+			EOR		R9, R1, R10
+  60:	e021900a 	eor	r9, r1, r10
+			EOR		R8, R1, R11
+  64:	e021800b 	eor	r8, r1, r11
+			CMP		R9, R8
+  68:	e1590008 	cmp	r9, r8
+			MOVGE   R1, R8
+  6c:	a1a01008 	movge	r1, r8
+			CMP		R8, R9
+  70:	e1580009 	cmp	r8, r9
+			MOVGE	R1, R9
+  74:	a1a01009 	movge	r1, r9
+			BL		ONES
+  78:	eb000003 	bl	8c <ONES>
+			CMP		R7, R0			//checks if last word had greatest number of ones
+  7c:	e1570000 	cmp	r7, r0
+			BGE		NEXT			//if not goes to next
+  80:	aaffffe7 	bge	24 <NEXT>
+			MOV		R7, R0			//if yes stores it in r3
+  84:	e1a07000 	mov	r7, r0
+			B		NEXT	  		//goes to next word	
+  88:	eaffffe5 	b	24 <NEXT>
+
+0000008c <ONES>:
+
+ONES:	   	MOV     R0, #0          // R0 will hold the result
+  8c:	e3a00000 	mov	r0, #0
+
+00000090 <LOOPO>:
+LOOPO:		CMP     R1, #0          // loop until the data contains no more 1's
+  90:	e3510000 	cmp	r1, #0
+			MOVEQ   PC, LR            
+  94:	01a0f00e 	moveq	pc, lr
+			LSR     R2, R1, #1      // perform SHIFT, followed by AND
+  98:	e1a020a1 	lsr	r2, r1, #1
+			AND     R1, R1, R2      
+  9c:	e0011002 	and	r1, r1, r2
+			ADD     R0, #1          // count the string length so far
+  a0:	e2800001 	add	r0, r0, #1
+			B       LOOPO  
+  a4:	eafffff9 	b	90 <LOOPO>
+
+000000a8 <ZEROS>:
+
+ZEROS:		MOV     R0, #0          // R0 will hold the result
+  a8:	e3a00000 	mov	r0, #0
+			NEG		R1, R1
+  ac:	e2611000 	rsb	r1, r1, #0
+			SUBS	R1, #1
+  b0:	e2511001 	subs	r1, r1, #1
+
+000000b4 <LOOPZ>:
+LOOPZ:		CMP     R1, #0          // loop until the data contains no more 1's
+  b4:	e3510000 	cmp	r1, #0
+			MOVEQ   PC, LR            
+  b8:	01a0f00e 	moveq	pc, lr
+			LSR     R2, R1, #1      // perform SHIFT, followed by AND
+  bc:	e1a020a1 	lsr	r2, r1, #1
+			AND     R1, R1, R2      
+  c0:	e0011002 	and	r1, r1, r2
+			ADD     R0, #1          // count the string length so far
+  c4:	e2800001 	add	r0, r0, #1
+			B       LOOPZ	
+  c8:	eafffff9 	b	b4 <LOOPZ>
+
+000000cc <TEST_NUM>:
+  cc:	103fe00f 	.word	0x103fe00f
+  d0:	103fe06f 	.word	0x103fe06f
+  d4:	103fe02f 	.word	0x103fe02f
+  d8:	103fe06d 	.word	0x103fe06d
+  dc:	103fb3ce 	.word	0x103fb3ce
+  e0:	103f7a2f 	.word	0x103f7a2f
+  e4:	102b5c34 	.word	0x102b5c34
+  e8:	0000ffff 	.word	0x0000ffff
+  ec:	10444444 	.word	0x10444444
+  f0:	10000000 	.word	0x10000000
+  f4:	103f3542 	.word	0x103f3542
+  f8:	1023554f 	.word	0x1023554f
+  fc:	aaaaaa00 	.word	0xaaaaaa00
+ 100:	00000000 	.word	0x00000000
+
+00000104 <MaskOne>:
+ 104:	aaaaaaaa 	.word	0xaaaaaaaa
+
+00000108 <MaskTwo>:
+ 108:	55555555 	.word	0x55555555
+
+0000010c <SEG7_CODE>:
+/* Subroutine to convert the digits from 0 to 9 to be shown on a HEX display.
+ *    Parameters: R0 = the decimal value of the digit to be displayed
+ *    Returns: R0 = bit patterm to be written to the HEX display
+ */
+
+SEG7_CODE:  MOV     R1, #BIT_CODES  
+ 10c:	e3a01f47 	mov	r1, #284	; 0x11c
+            ADD     R1, R0         // index into the BIT_CODES "array"
+ 110:	e0811000 	add	r1, r1, r0
+            LDRB    R0, [R1]       // load the bit pattern (to be returned)
+ 114:	e5d10000 	ldrb	r0, [r1]
+            MOV     PC, LR              
+ 118:	e1a0f00e 	mov	pc, lr
+
+0000011c <BIT_CODES>:
+ 11c:	4f5b063f 	.word	0x4f5b063f
+ 120:	077d6d66 	.word	0x077d6d66
+ 124:	0000677f 	.word	0x0000677f
+
+00000128 <DISPLAY>:
+            .byte   0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01100111
+            .skip   2      // pad with 2 bytes to maintain word alignment
+
+
+/* Display R5 on HEX1-0, R6 on HEX3-2 and R7 on HEX5-4 */
+DISPLAY:    LDR     R8, =0xFF200020 // base address of HEX3-HEX0
+ 128:	e59f80a0 	ldr	r8, [pc, #160]	; 1d0 <END+0x4>
+            MOV     R0, R5          // display R5 on HEX1-0
+ 12c:	e1a00005 	mov	r0, r5
+            BL      DIVIDE          // ones digit will be in R0; tens
+ 130:	eb00001d 	bl	1ac <DIVIDE>
+                                    // digit in R1
+            MOV     R9, R1          // save the tens digit
+ 134:	e1a09001 	mov	r9, r1
+            BL      SEG7_CODE       
+ 138:	ebfffff3 	bl	10c <SEG7_CODE>
+            MOV     R4, R0          // save bit code
+ 13c:	e1a04000 	mov	r4, r0
+            MOV     R0, R9          // retrieve the tens digit, get bit
+ 140:	e1a00009 	mov	r0, r9
+                                    // code
+            BL      SEG7_CODE       
+ 144:	ebfffff0 	bl	10c <SEG7_CODE>
+            LSL     R0, #8
+ 148:	e1a00400 	lsl	r0, r0, #8
+            ORR     R4, R0
+ 14c:	e1844000 	orr	r4, r4, r0
+			
+            MOV     R0, R6             
+ 150:	e1a00006 	mov	r0, r6
+            BL      DIVIDE          // ones digit will be in R0; tens
+ 154:	eb000014 	bl	1ac <DIVIDE>
+                                    // digit in R1
+			MOV     R9, R1          // save the tens digit
+ 158:	e1a09001 	mov	r9, r1
+            BL      SEG7_CODE       
+ 15c:	ebffffea 	bl	10c <SEG7_CODE>
+            LSL     R0, #16
+ 160:	e1a00800 	lsl	r0, r0, #16
+            ORR     R4, R0
+ 164:	e1844000 	orr	r4, r4, r0
+            MOV     R0, R9          // retrieve the tens digit, get bit
+ 168:	e1a00009 	mov	r0, r9
+                                    // code
+            BL      SEG7_CODE       
+ 16c:	ebffffe6 	bl	10c <SEG7_CODE>
+            LSL     R0, #24
+ 170:	e1a00c00 	lsl	r0, r0, #24
+            ORR     R4, R0
+ 174:	e1844000 	orr	r4, r4, r0
+
+            STR     R4, [R8]        // display the numbers from R6 and R5
+ 178:	e5884000 	str	r4, [r8]
+            LDR     R8, =0xFF200030 // base address of HEX5-HEX4
+ 17c:	e59f8050 	ldr	r8, [pc, #80]	; 1d4 <END+0x8>
+            MOV     R0, R7          // display R5 on HEX1-0
+ 180:	e1a00007 	mov	r0, r7
+            BL      DIVIDE          // ones digit will be in R0; tens
+ 184:	eb000008 	bl	1ac <DIVIDE>
+                                    // digit in R1
+
+            MOV     R9, R1          // save the tens digit
+ 188:	e1a09001 	mov	r9, r1
+            BL      SEG7_CODE       
+ 18c:	ebffffde 	bl	10c <SEG7_CODE>
+            MOV     R4, R0          // save bit code
+ 190:	e1a04000 	mov	r4, r0
+            MOV     R0, R9          // retrieve the tens digit, get bit
+ 194:	e1a00009 	mov	r0, r9
+                                    // code
+            BL      SEG7_CODE       
+ 198:	ebffffdb 	bl	10c <SEG7_CODE>
+            LSL     R0, #8
+ 19c:	e1a00400 	lsl	r0, r0, #8
+            ORR     R4, R0
+ 1a0:	e1844000 	orr	r4, r4, r0
+
+            STR     R4, [R8]        // display the number from R7
+ 1a4:	e5884000 	str	r4, [r8]
+			B 		END
+ 1a8:	ea000007 	b	1cc <END>
+
+000001ac <DIVIDE>:
+
+DIVIDE:   	MOV    	R2, #0			// Setting the quotients to zero
+ 1ac:	e3a02000 	mov	r2, #0
+
+000001b0 <DTEN>:
+DTEN:       CMP    	R0, #10			// Checking if the value is greater than the Divisor to the Second power
+ 1b0:	e350000a 	cmp	r0, #10
+            BLT    	DIV_END			// Moving to the next function if Divisor is greater than the remaining value
+ 1b4:	ba000002 	blt	1c4 <DIV_END>
+            SUB    	R0, #10			// Subtracting the divisor from the remaining value
+ 1b8:	e240000a 	sub	r0, r0, #10
+            ADD    	R2, #1			// incrementing Tens value for each time through the full function
+ 1bc:	e2822001 	add	r2, r2, #1
+            B      	DTEN			// going back to beginning of function
+ 1c0:	eafffffa 	b	1b0 <DTEN>
+
+000001c4 <DIV_END>:
+DIV_END:    MOV    	R1, R2       	// quotient in R1 (remainder in R0)
+ 1c4:	e1a01002 	mov	r1, r2
+            MOV    	PC, LR
+ 1c8:	e1a0f00e 	mov	pc, lr
+
+000001cc <END>:
+
+END:      	B       END    
+ 1cc:	eafffffe 	b	1cc <END>
+ 1d0:	ff200020 	.word	0xff200020
+ 1d4:	ff200030 	.word	0xff200030

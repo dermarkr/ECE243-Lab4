@@ -1,0 +1,75 @@
+
+C:/Users/Bob/Desktop/ECE243_Computer_Organization/Labs/Lab_4/part2/part2.axf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <__cs3_interrupt_vector>:
+/* Program that counts consecutive 1's */
+
+			.text                   // executable code follows
+			.global _start                  
+_start:                             
+			MOV     R4, #TEST_NUM   // load the data word ...
+   0:	e3a0404c 	mov	r4, #76	; 0x4c
+			MOV		R3, #0
+   4:	e3a03000 	mov	r3, #0
+
+00000008 <NEXT>:
+NEXT:		LDR     R1, [R4]        // into R1
+   8:	e5941000 	ldr	r1, [r4]
+			CMP     R1, #0
+   c:	e3510000 	cmp	r1, #0
+			BEQ     END
+  10:	0a00000c 	beq	48 <END>
+			ADD     R4, #4
+  14:	e2844004 	add	r4, r4, #4
+			BL		ONES
+  18:	eb000003 	bl	2c <ONES>
+			CMP		R3, R0
+  1c:	e1530000 	cmp	r3, r0
+			BGE		NEXT
+  20:	aafffff8 	bge	8 <NEXT>
+			MOV		R3, R0
+  24:	e1a03000 	mov	r3, r0
+			B		NEXT	  
+  28:	eafffff6 	b	8 <NEXT>
+
+0000002c <ONES>:
+
+ONES:	   	MOV     R0, #0          // R0 will hold the result
+  2c:	e3a00000 	mov	r0, #0
+
+00000030 <LOOP>:
+LOOP:		CMP     R1, #0          // loop until the data contains no more 1's
+  30:	e3510000 	cmp	r1, #0
+			MOVEQ   PC, LR            
+  34:	01a0f00e 	moveq	pc, lr
+			LSR     R2, R1, #1      // perform SHIFT, followed by AND
+  38:	e1a020a1 	lsr	r2, r1, #1
+			AND     R1, R1, R2      
+  3c:	e0011002 	and	r1, r1, r2
+			ADD     R0, #1          // count the string length so far
+  40:	e2800001 	add	r0, r0, #1
+			B       LOOP            
+  44:	eafffff9 	b	30 <LOOP>
+
+00000048 <END>:
+
+END:      	B       END             
+  48:	eafffffe 	b	48 <END>
+
+0000004c <TEST_NUM>:
+  4c:	103fe00f 	.word	0x103fe00f
+  50:	103fe06f 	.word	0x103fe06f
+  54:	103fe02f 	.word	0x103fe02f
+  58:	103fe06d 	.word	0x103fe06d
+  5c:	103fb3ce 	.word	0x103fb3ce
+  60:	103f7a2f 	.word	0x103f7a2f
+  64:	102b5c34 	.word	0x102b5c34
+  68:	10111111 	.word	0x10111111
+  6c:	10444444 	.word	0x10444444
+  70:	10512341 	.word	0x10512341
+  74:	103f3542 	.word	0x103f3542
+  78:	1023554f 	.word	0x1023554f
+  7c:	00000000 	.word	0x00000000
